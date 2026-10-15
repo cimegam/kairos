@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Fila em Tempo Real | Barbearia Jardim Carapina</title>
+  <meta name="description" content="Acompanhe a fila da barbearia em tempo real em Jardim Carapina, Serra/ES. Saiba quantas pessoas estão esperando e o tempo estimado antes de sair de casa!">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0c10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/logo.jpg">
+</head>
+<body>
+  <div class="container">
+    <!-- Header com Identidade Visual Kairos -->
+    <header class="brand-header">
+      <div class="logo-wrapper">
+        <img src="/logo.jpg" alt="Kairos Barbershop Logo" class="logo-img" onerror="this.style.display='none'">
+      </div>
+      <div class="brand-badge">
+        <span>👑</span> Jardim Carapina • Serra/ES
+      </div>
+      <h1 class="brand-title" id="shop-name">Kairos Barbearia</h1>
+      <p class="brand-tagline">Mais que um corte, um estilo de vida</p>
+      <p class="brand-hours" id="shop-hours">Seg a Sáb: 09:00 às 19:30 | Dom: Fechado</p>
+    </header>
+
+    <!-- Banner se estiver fechado -->
+    <div id="closed-warning" class="closed-banner" style="display: none;">
+      ⚠️ A barbearia está fechada no momento ou em intervalo.
+    </div>
+
+    <!-- Banner de Promoção Ativa -->
+    <div id="promo-container" class="promo-banner" style="display: none;">
+      <div class="promo-badge">OFERTA</div>
+      <div>
+        <div class="promo-title" id="promo-title">Promoção Relâmpago</div>
+        <div class="promo-desc" id="promo-desc">Desconto especial para os próximos clientes!</div>
+        <div class="promo-cond" id="promo-cond">Apenas hoje</div>
+      </div>
+    </div>
+
+    <!-- Card Principal da Fila -->
+    <div class="card queue-card">
+      <div class="live-indicator">
+        <span class="pulse-dot"></span>
+        <span id="connection-status">Fila ao vivo</span>
+      </div>
+
+      <div class="queue-number" id="queue-count">0</div>
+      <div class="queue-label" id="queue-label">Pessoas na fila agora</div>
+
+      <div class="queue-meta-box">
+        <div class="meta-item">
+          <div class="val" id="wait-time">~0 min</div>
+          <div class="lbl">Espera Estimada</div>
+        </div>
+        <div class="meta-item">
+          <div class="val" id="avg-time">25 min</div>
+          <div class="lbl">Por Cliente</div>
+        </div>
+        <div class="meta-item">
+          <div class="val" id="shop-status" style="color: var(--green-online);">Aberto</div>
+          <div class="lbl">Status</div>
+        </div>
+      </div>
+
+      <p class="disclaimer-text">
+        * O tempo de espera é uma estimativa calculada pela média de cortes. Pode variar conforme o tipo de serviço.
+      </p>
+    </div>
+
+    <!-- Ações Rápidas (WhatsApp e Localização) -->
+    <div class="action-grid">
+      <a id="btn-whatsapp" href="#" target="_blank" class="btn btn-whatsapp">
+        <span>💬</span> Chamar no WhatsApp
+      </a>
+      <a id="btn-maps" href="#" target="_blank" class="btn btn-maps">
+        <span>📍</span> Como Chegar (Maps)
+      </a>
+      <a href="/admin" class="btn btn-admin">
+        <span>🔒</span> Acesso do Barbeiro
+      </a>
+    </div>
+
+    <!-- Tabela de Preços e Serviços -->
+    <div class="card" style="margin-top: 18px;">
+      <div class="section-title">
+        <span>✂️</span> Tabela de Serviços & Preços
+      </div>
+      <div id="services-list">
+        <!-- Renderizado dinamicamente -->
+      </div>
+    </div>
+
+    <!-- Informações de Localização -->
+    <div class="card">
+      <div class="section-title">
+        <span>🏠</span> Localização & Contato
+      </div>
+      <div class="info-row">
+        <span class="info-icon">📍</span>
+        <span id="shop-address">Rua Principal, Jardim Carapina - Serra/ES</span>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">🧭</span>
+        <span id="shop-ref">Ponto de referência: Próximo à praça</span>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">🕒</span>
+        <span id="shop-hours-info">Segunda a Sábado</span>
+      </div>
+    </div>
+
+    <footer class="footer">
+      Barbearia Inteligente © Jardim Carapina • Atualização em tempo real via WebSocket
+    </footer>
+  </div>
+
+  <script>
+    let socket = null;
+
+    function renderData(data) {
+      if (!data) return;
+
+      // Shop Info
+      if (data.shopInfo) {
+        document.getElementById('shop-name').textContent = data.shopInfo.name || 'Barbearia';
+        document.getElementById('shop-hours').textContent = data.shopInfo.businessHours || '';
+        document.getElementById('shop-hours-info').textContent = data.shopInfo.businessHours || '';
+        document.getElementById('shop-address').textContent = data.shopInfo.address || '';
+        document.getElementById('shop-ref').textContent = `Ponto de referência: ${data.shopInfo.referencePoint || 'Não informado'}`;
+        
+        // Maps Link
+        if (data.shopInfo.googleMapsUrl) {
+          document.getElementById('btn-maps').href = data.shopInfo.googleMapsUrl;
+        }
+
+        // WhatsApp Link com mensagem pronta
+        if (data.shopInfo.whatsappNumber) {
+          const rawNum = data.shopInfo.whatsappNumber.replace(/\D/g, '');
+          const msg = encodeURIComponent(`Olá! Vi a fila da barbearia pelo site e gostaria de tirar uma dúvida.`);
+          document.getElementById('btn-whatsapp').href = `https://wa.me/${rawNum}?text=${msg}`;
+        }
+      }
+
+      // Fila e Espera
+      const count = Number(data.queueCount) || 0;
+      document.getElementById('queue-count').textContent = count;
+      document.getElementById('queue-label').textContent = count === 1 ? 'Pessoa na fila agora' : 'Pessoas na fila agora';
+      
+      const avg = Number(data.avgTimePerClient) || 25;
+      document.getElementById('avg-time').textContent = `${avg} min`;
+      
+      const wait = Number(data.estimatedWaitMinutes) || (count * avg);
+      document.getElementById('wait-time').textContent = wait === 0 ? 'Sem espera!' : `~${wait} min`;
+
+      // Aberto / Fechado
+      const isOpen = data.isOpen !== false;
+      const statusEl = document.getElementById('shop-status');
+      const closedBanner = document.getElementById('closed-warning');
+      if (isOpen) {
+        statusEl.textContent = 'Aberto';
+        statusEl.style.color = 'var(--green)';
+        closedBanner.style.display = 'none';
+      } else {
+        statusEl.textContent = 'Fechado';
+        statusEl.style.color = 'var(--red)';
+        closedBanner.style.display = 'block';
+      }
+
+      // Promoção
+      const promoContainer = document.getElementById('promo-container');
+      if (data.promotion && data.promotion.isActive) {
+        promoContainer.style.display = 'flex';
+        document.getElementById('promo-title').textContent = data.promotion.title || 'Promoção';
+        document.getElementById('promo-desc').textContent = data.promotion.description || '';
+        document.getElementById('promo-cond').textContent = data.promotion.conditions || '';
+      } else {
+        promoContainer.style.display = 'none';
+      }
+
+      // Serviços
+      const servicesList = document.getElementById('services-list');
+      if (data.services && data.services.length > 0) {
+        servicesList.innerHTML = data.services.map(s => `
+          <div class="service-item">
+            <div>
+              <div class="service-name">${s.name}</div>
+              <div class="service-duration">⏱️ ~${s.duration || 20} min</div>
+            </div>
+            <div class="service-price">R$ ${Number(s.price).toFixed(2)}</div>
+          </div>
+        `).join('');
+      } else {
+        servicesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem;">Nenhum serviço listado.</div>';
+      }
+    }
+
+    // Carregamento inicial via REST
+    fetch('/api/public/status')
+      .then(res => res.json())
+      .then(data => renderData(data))
+      .catch(err => console.error("Erro ao carregar dados iniciais:", err));
+
+    // Conexão WebSocket para atualização em tempo real
+    function connectWS() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}`;
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        document.getElementById('connection-status').textContent = 'Fila ao vivo';
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.type === 'INITIAL_STATE' || payload.type === 'UPDATE') {
+            renderData(payload.data);
+          }
+        } catch (e) {
+          console.error("Erro ao processar mensagem do socket:", e);
+        }
+      };
+
+      socket.onclose = () => {
+        document.getElementById('connection-status').textContent = 'Reconectando...';
+        setTimeout(connectWS, 2500);
+      };
+
+      socket.onerror = () => {
+        socket.close();
+      };
+    }
+
+    connectWS();
+  </script>
+</body>
+</html>

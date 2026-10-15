@@ -1,0 +1,16 @@
+{
+  "name": "Kairos Barbearia",
+  "short_name": "Kairos Barber",
+  "description": "Fila em tempo real e serviços da Barbearia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0c10",
+  "theme_color": "#0a0c10",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

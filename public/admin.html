@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Painel do Barbeiro | Fila & Gerenciamento</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Tela de Login -->
+    <div id="login-section">
+      <header>
+        <div class="admin-badge">Acesso Restrito</div>
+        <h1 style="margin-top: 8px;">Painel do Barbeiro</h1>
+        <p class="subtitle">Digite a senha para gerenciar a fila e a barbearia</p>
+      </header>
+
+      <div class="card" style="margin-top: 20px;">
+        <form id="form-login" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="admin-pass">Senha de Acesso:</label>
+            <input type="password" id="admin-pass" class="form-control" placeholder="Digite a senha..." required autofocus>
+          </div>
+          <div id="login-error" style="color: var(--red); font-size: 0.85rem; margin-bottom: 12px; display: none;">
+            Senha incorreta. Tente novamente.
+          </div>
+          <button type="submit" class="btn btn-add" style="width: 100%;">
+            Entrar no Painel
+          </button>
+        </form>
+      </div>
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="/" style="color: var(--text-muted); font-size: 0.9rem; text-decoration: none;">← Voltar para a página pública</a>
+      </div>
+    </div>
+
+    <!-- Painel Administrativo -->
+    <div id="admin-dashboard" style="display: none;">
+      <header style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px;">
+        <div style="text-align: left;">
+          <div class="admin-badge">Barbeiro Online</div>
+          <h1 style="font-size: 1.4rem; margin-top: 4px;">Controle da Fila</h1>
+        </div>
+        <button onclick="handleLogout()" class="btn btn-admin" style="padding: 8px 12px; font-size: 0.8rem;">
+          Sair 🚪
+        </button>
+      </header>
+
+      <!-- Card da Fila com Botões Gigantes -->
+      <div class="card queue-card">
+        <div class="live-indicator">
+          <span class="pulse-dot"></span>
+          <span>Sincronizado ao Vivo</span>
+        </div>
+
+        <div class="queue-number" id="dash-queue-count">0</div>
+        <div class="queue-label">Pessoas aguardando corte</div>
+
+        <div class="queue-meta-box">
+          <div class="meta-item">
+            <div class="val" id="dash-wait-time">~0 min</div>
+            <div class="lbl">Espera Estimada</div>
+          </div>
+          <div class="meta-item">
+            <div class="val" id="dash-avg-time">25 min</div>
+            <div class="lbl">Tempo Médio</div>
+          </div>
+        </div>
+
+        <!-- Botões de Operação Rápida -->
+        <div class="big-btn-grid">
+          <button onclick="changeQueue('increment')" class="btn btn-huge btn-add" id="btn-add-client">
+            <span>➕ 1 CLIENTE</span>
+            <small style="font-size: 0.75rem; font-weight: normal; opacity: 0.9;">Chegou alguém na loja</small>
+          </button>
+          
+          <button onclick="changeQueue('decrement')" class="btn btn-huge btn-remove" id="btn-sub-client">
+            <span>➖ 1 CLIENTE</span>
+            <small style="font-size: 0.75rem; font-weight: normal; opacity: 0.9;">Desistência ou erro</small>
+          </button>
+
+          <button onclick="changeQueue('next')" class="btn btn-huge btn-next" id="btn-next-client">
+            <span>✂️ PRÓXIMO ATENDIDO</span>
+            <small style="font-size: 0.8rem; font-weight: normal;">Chamar e descontar da fila</small>
+          </button>
+        </div>
+
+        <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center;">
+          <button onclick="openPublicPage()" class="btn btn-maps" style="font-size: 0.85rem; padding: 8px 14px;">
+            👁️ Ver Tela do Cliente
+          </button>
+          <button onclick="resetQueue()" class="btn btn-admin" style="font-size: 0.85rem; padding: 8px 14px; color: #f87171;">
+            Zerar Fila
+          </button>
+        </div>
+      </div>
+
+      <!-- Configurações Rápidas: Tempo Médio & Aberto/Fechado -->
+      <div class="card">
+        <div class="section-title">
+          <span>⚙️</span> Ritmo & Status da Barbearia
+        </div>
+
+        <div class="form-group">
+          <label for="input-avg-time">Tempo Médio por Atendimento (minutos):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="number" id="input-avg-time" class="form-control" min="5" max="120" step="5">
+            <button onclick="saveAvgTime()" class="btn btn-add" style="white-space: nowrap; padding: 0 16px;">Salvar</button>
+          </div>
+          <small style="color: var(--text-muted); font-size: 0.75rem;">Calcula automaticamente a estimativa para os clientes no site e no WhatsApp.</small>
+        </div>
+
+        <div class="switch-label">
+          <div>
+            <strong>Barbearia Aberta para Atendimento</strong>
+            <div style="color: var(--text-muted); font-size: 0.8rem;">Desative ao encerrar o expediente ou fazer intervalo</div>
+          </div>
+          <input type="checkbox" id="toggle-is-open" class="switch-input" onchange="toggleShopOpen()">
+        </div>
+      </div>
+
+      <!-- Gestão de Promoções Relâmpago -->
+      <div class="card">
+        <div class="section-title">
+          <span>🎁</span> Promoção Relâmpago
+        </div>
+
+        <div class="switch-label" style="border-bottom: 1px solid var(--border-color); margin-bottom: 12px; padding-bottom: 8px;">
+          <div>
+            <strong>Ativar Promoção no Site</strong>
+            <div style="color: var(--text-muted); font-size: 0.8rem;">Aparecerá com destaque na tela dos clientes</div>
+          </div>
+          <input type="checkbox" id="promo-active-toggle" class="switch-input" onchange="savePromotion()">
+        </div>
+
+        <div class="form-group">
+          <label for="promo-title-input">Título da Oferta:</label>
+          <input type="text" id="promo-title-input" class="form-control" placeholder="Ex: Desconto de Terça-Feira">
+        </div>
+
+        <div class="form-group">
+          <label for="promo-desc-input">Descrição / Desconto:</label>
+          <input type="text" id="promo-desc-input" class="form-control" placeholder="Ex: Corte + Barba por R$ 35 até as 16h">
+        </div>
+
+        <div class="form-group">
+          <label for="promo-cond-input">Regras / Condições:</label>
+          <input type="text" id="promo-cond-input" class="form-control" placeholder="Ex: Válido hoje para pagamentos em Pix">
+        </div>
+
+        <button onclick="savePromotion()" class="btn btn-add" style="width: 100%;">
+          Atualizar Promoção
+        </button>
+      </div>
+
+      <!-- Configuração de Informações Comerciais -->
+      <div class="card">
+        <div class="section-title">
+          <span>🏠</span> Dados da Barbearia & WhatsApp
+        </div>
+
+        <div class="form-group">
+          <label for="shop-name-input">Nome da Barbearia:</label>
+          <input type="text" id="shop-name-input" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="shop-address-input">Endereço Completo:</label>
+          <input type="text" id="shop-address-input" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="shop-ref-input">Ponto de Referência (em Jardim Carapina):</label>
+          <input type="text" id="shop-ref-input" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="shop-maps-input">Link do Google Maps:</label>
+          <input type="url" id="shop-maps-input" class="form-control" placeholder="https://maps.google.com/...">
+        </div>
+
+        <div class="form-group">
+          <label for="shop-zap-input">WhatsApp da Barbearia (com DDD, somente números):</label>
+          <input type="text" id="shop-zap-input" class="form-control" placeholder="5527999999999">
+        </div>
+
+        <div class="form-group">
+          <label for="shop-hours-input">Horário de Funcionamento:</label>
+          <input type="text" id="shop-hours-input" class="form-control" placeholder="Seg a Sáb: 09:00 às 19:30">
+        </div>
+
+        <button onclick="saveShopInfo()" class="btn btn-add" style="width: 100%;">
+          Salvar Dados Comerciais
+        </button>
+      </div>
+
+      <!-- Configuração de Serviços e Preços -->
+      <div class="card">
+        <div class="section-title">
+          <span>✂️</span> Gerenciar Preços & Serviços
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px;">
+          Edite valores e tempos para atualizar o cardápio público do cliente:
+        </p>
+
+        <div id="services-editor-container">
+          <!-- Renderizado via JS -->
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button onclick="addServiceRow()" class="btn btn-maps" style="flex: 1; font-size: 0.85rem;">
+            ➕ Novo Serviço
+          </button>
+          <button onclick="saveServicesFromAdmin()" class="btn btn-add" style="flex: 1; font-size: 0.85rem;">
+            💾 Salvar Preços
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      Painel Administrativo • Barbearia Jardim Carapina
+    </footer>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('barbearia_token');
+    let socket = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (token) {
+        showDashboard();
+      } else {
+        showLogin();
+      }
+    });
+
+    function showLogin() {
+      document.getElementById('login-section').style.display = 'block';
+      document.getElementById('admin-dashboard').style.display = 'none';
+    }
+
+    function showDashboard() {
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('admin-dashboard').style.display = 'block';
+      loadAdminData();
+      connectWS();
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById('admin-pass').value;
+      const errEl = document.getElementById('login-error');
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        if (res.ok && data.token) {
+          token = data.token;
+          localStorage.setItem('barbearia_token', token);
+          showDashboard();
+        } else {
+          errEl.textContent = data.error || 'Senha incorreta.';
+          errEl.style.display = 'block';
+        }
+      } catch (err) {
+        errEl.textContent = 'Erro de conexão com o servidor.';
+        errEl.style.display = 'block';
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('barbearia_token');
+      token = null;
+      if (socket) socket.close();
+      showLogin();
+    }
+
+    function openPublicPage() {
+      window.open('/', '_blank');
+    }
+
+    async function loadAdminData() {
+      try {
+        const res = await fetch('/api/admin/data', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.status === 401 || res.status === 403) {
+          handleLogout();
+          return;
+        }
+        const data = await res.json();
+        populateFields(data);
+      } catch (err) {
+        console.error("Erro ao carregar dados admin:", err);
+      }
+    }
+
+    function populateFields(data) {
+      if (!data) return;
+      const count = Number(data.queueCount) || 0;
+      const avg = Number(data.avgTimePerClient) || 25;
+      const wait = count * avg;
+
+      document.getElementById('dash-queue-count').textContent = count;
+      document.getElementById('dash-avg-time').textContent = `${avg} min`;
+      document.getElementById('dash-wait-time').textContent = `~${wait} min`;
+
+      document.getElementById('input-avg-time').value = avg;
+      document.getElementById('toggle-is-open').checked = data.isOpen !== false;
+
+      // Promoção
+      if (data.promotion) {
+        document.getElementById('promo-active-toggle').checked = !!data.promotion.isActive;
+        document.getElementById('promo-title-input').value = data.promotion.title || '';
+        document.getElementById('promo-desc-input').value = data.promotion.description || '';
+        document.getElementById('promo-cond-input').value = data.promotion.conditions || '';
+      }
+
+      // Loja
+      if (data.shopInfo) {
+        document.getElementById('shop-name-input').value = data.shopInfo.name || '';
+        document.getElementById('shop-address-input').value = data.shopInfo.address || '';
+        document.getElementById('shop-ref-input').value = data.shopInfo.referencePoint || '';
+        document.getElementById('shop-maps-input').value = data.shopInfo.googleMapsUrl || '';
+        document.getElementById('shop-zap-input').value = data.shopInfo.whatsappNumber || '';
+        document.getElementById('shop-hours-input').value = data.shopInfo.businessHours || '';
+      }
+
+      // Serviços
+      if (data.services) {
+        renderServicesEditor(data.services);
+      }
+    }
+
+    function renderServicesEditor(services) {
+      const container = document.getElementById('services-editor-container');
+      container.innerHTML = services.map((s, idx) => `
+        <div class="service-edit-row" style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;" data-index="${idx}">
+          <input type="text" class="form-control s-name" value="${s.name}" placeholder="Nome do corte/serviço" style="flex: 2;">
+          <input type="number" class="form-control s-price" value="${s.price}" placeholder="Preço (R$)" style="flex: 1;" min="0" step="5">
+          <input type="number" class="form-control s-dur" value="${s.duration || 25}" placeholder="Min" style="width: 70px;" min="5" step="5">
+          <button type="button" onclick="this.parentElement.remove()" class="btn btn-remove" style="padding: 10px 14px; font-size: 0.8rem;">❌</button>
+        </div>
+      `).join('');
+    }
+
+    function addServiceRow() {
+      const container = document.getElementById('services-editor-container');
+      const div = document.createElement('div');
+      div.className = 'service-edit-row';
+      div.style = 'display: flex; gap: 8px; margin-bottom: 8px; align-items: center;';
+      div.innerHTML = `
+        <input type="text" class="form-control s-name" placeholder="Nome do serviço" style="flex: 2;">
+        <input type="number" class="form-control s-price" placeholder="Preço (R$)" style="flex: 1;" min="0" step="5">
+        <input type="number" class="form-control s-dur" value="25" placeholder="Min" style="width: 70px;" min="5" step="5">
+        <button type="button" onclick="this.parentElement.remove()" class="btn btn-remove" style="padding: 10px 14px; font-size: 0.8rem;">❌</button>
+      `;
+      container.appendChild(div);
+    }
+
+    async function saveServicesFromAdmin() {
+      const rows = document.querySelectorAll('.service-edit-row');
+      const services = [];
+      rows.forEach((row, idx) => {
+        const name = row.querySelector('.s-name').value.trim();
+        const price = parseFloat(row.querySelector('.s-price').value) || 0;
+        const duration = parseInt(row.querySelector('.s-dur').value, 10) || 20;
+        if (name) {
+          services.push({ id: idx + 1, name, price, duration });
+        }
+      });
+
+      try {
+        const res = await fetch('/api/admin/services', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ services })
+        });
+        if (res.ok) {
+          alert('Tabela de serviços e preços salva com sucesso!');
+        }
+      } catch (e) {
+        alert('Erro ao salvar serviços.');
+      }
+    }
+
+    async function changeQueue(action) {
+      try {
+        const res = await fetch('/api/admin/queue', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ action })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('dash-queue-count').textContent = data.queueCount;
+          const avg = parseInt(document.getElementById('input-avg-time').value, 10) || 25;
+          document.getElementById('dash-wait-time').textContent = `~${data.queueCount * avg} min`;
+        }
+      } catch (err) {
+        alert("Erro ao alterar fila. Verifique a conexão.");
+      }
+    }
+
+    async function resetQueue() {
+      if (!confirm("Tem certeza que deseja zerar a fila de clientes?")) return;
+      try {
+        const res = await fetch('/api/admin/queue', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ action: 'set', value: 0 })
+        });
+        if (res.ok) {
+          document.getElementById('dash-queue-count').textContent = 0;
+          document.getElementById('dash-wait-time').textContent = '~0 min';
+        }
+      } catch (err) {
+        alert("Erro ao zerar fila.");
+      }
+    }
+
+    async function saveAvgTime() {
+      const avg = parseInt(document.getElementById('input-avg-time').value, 10);
+      if (!avg || avg <= 0) return alert("Informe um tempo válido.");
+
+      try {
+        const res = await fetch('/api/admin/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ avgTimePerClient: avg })
+        });
+        if (res.ok) {
+          alert("Tempo médio atualizado com sucesso!");
+          const count = parseInt(document.getElementById('dash-queue-count').textContent, 10) || 0;
+          document.getElementById('dash-avg-time').textContent = `${avg} min`;
+          document.getElementById('dash-wait-time').textContent = `~${count * avg} min`;
+        }
+      } catch (e) {
+        alert("Erro ao salvar tempo médio.");
+      }
+    }
+
+    async function toggleShopOpen() {
+      const isOpen = document.getElementById('toggle-is-open').checked;
+      try {
+        await fetch('/api/admin/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ isOpen })
+        });
+      } catch (e) {
+        alert("Erro ao alterar status de funcionamento.");
+      }
+    }
+
+    async function savePromotion() {
+      const isActive = document.getElementById('promo-active-toggle').checked;
+      const title = document.getElementById('promo-title-input').value;
+      const description = document.getElementById('promo-desc-input').value;
+      const conditions = document.getElementById('promo-cond-input').value;
+
+      try {
+        const res = await fetch('/api/admin/promotion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ isActive, title, description, conditions })
+        });
+        if (res.ok) {
+          alert("Promoção salva e sincronizada!");
+        }
+      } catch (e) {
+        alert("Erro ao salvar promoção.");
+      }
+    }
+
+    async function saveShopInfo() {
+      const payload = {
+        name: document.getElementById('shop-name-input').value,
+        address: document.getElementById('shop-address-input').value,
+        referencePoint: document.getElementById('shop-ref-input').value,
+        googleMapsUrl: document.getElementById('shop-maps-input').value,
+        whatsappNumber: document.getElementById('shop-zap-input').value,
+        businessHours: document.getElementById('shop-hours-input').value
+      };
+
+      try {
+        const res = await fetch('/api/admin/shop-info', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert("Dados da barbearia salvos com sucesso!");
+        }
+      } catch (e) {
+        alert("Erro ao salvar dados comerciais.");
+      }
+    }
+
+    function connectWS() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}`;
+      socket = new WebSocket(wsUrl);
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.type === 'UPDATE' && payload.data) {
+            document.getElementById('dash-queue-count').textContent = payload.data.queueCount;
+            document.getElementById('dash-wait-time').textContent = `~${payload.data.estimatedWaitMinutes} min`;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      };
+
+      socket.onclose = () => {
+        if (token) setTimeout(connectWS, 3000);
+      };
+    }
+  </script>
+</body>
+</html>
