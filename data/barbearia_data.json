@@ -1,6 +1,6 @@
 {
   "queueCount": 0,
-  "avgTimePerClient": 20,
+  "avgTimePerClient": 40,
   "isOpen": true,
   "statusMessage": "Aberto e atendendo por ordem de chegada!",
   "shopInfo": {
@@ -61,5 +61,19 @@
     "description": "R$ 5 de desconto",
     "conditions": "Até 16h"
   },
-  "lastUpdated": "2026-10-17T20:26:41.898Z"
+  "lastUpdated": "2026-10-17T20:26:41.898Z",
+  "barbers": [
+    {
+      "id": "joao",
+      "name": "João",
+      "queueCount": 0,
+      "isOpen": true
+    },
+    {
+      "id": "juninho",
+      "name": "Juninho",
+      "queueCount": 0,
+      "isOpen": true
+    }
+  ]
 }

@@ -44,13 +44,24 @@ function broadcastUpdate(data) {
 // Filtro de dados públicos (sem expor credenciais)
 function getPublicData(data) {
   const current = data || getData();
-  const queueCount = Number(current.queueCount) || 0;
-  const avgTime = Number(current.avgTimePerClient) || 25;
-  const estimatedWaitMinutes = queueCount * avgTime;
+  const barbers = (current.barbers && current.barbers.length > 0) ? current.barbers : [
+    { id: 'joao', name: 'João', queueCount: 0, isOpen: true },
+    { id: 'juninho', name: 'Juninho', queueCount: 0, isOpen: true }
+  ];
+  const queueCount = barbers.reduce((acc, b) => acc + (Number(b.queueCount) || 0), 0);
+  const avgTime = Number(current.avgTimePerClient) || 40;
+  const estimatedWaitMinutes = Math.max(...barbers.map(b => (Number(b.queueCount) || 0) * avgTime), 0);
 
   return {
     shopInfo: current.shopInfo,
     queueCount,
+    barbers: barbers.map(b => ({
+      id: b.id,
+      name: b.name,
+      queueCount: Number(b.queueCount) || 0,
+      isOpen: b.isOpen !== false,
+      estimatedWaitMinutes: (Number(b.queueCount) || 0) * avgTime
+    })),
     avgTimePerClient: avgTime,
     estimatedWaitMinutes,
     isOpen: current.isOpen,
@@ -144,27 +155,42 @@ app.get('/api/admin/data', authMiddleware, (req, res) => {
 
 // Alterações rápidas na fila (+1, -1, zerar ou definir valor)
 app.post('/api/admin/queue', authMiddleware, (req, res) => {
-  const { action, value } = req.body;
+  const { action, value, barberId } = req.body;
   const current = getData();
 
-  if (action === 'increment') {
-    current.queueCount = (Number(current.queueCount) || 0) + 1;
-  } else if (action === 'decrement' || action === 'next') {
-    const count = Number(current.queueCount) || 0;
-    current.queueCount = Math.max(0, count - 1);
-  } else if (action === 'set') {
-    const num = parseInt(value, 10);
-    if (isNaN(num) || num < 0) {
-      return res.status(400).json({ error: 'Valor da fila deve ser um número maior ou igual a 0.' });
-    }
-    current.queueCount = num;
-  } else {
-    return res.status(400).json({ error: 'Ação inválida. Use increment, decrement, next ou set.' });
+  if (!current.barbers || current.barbers.length === 0) {
+    current.barbers = [
+      { id: 'joao', name: 'João', queueCount: 0, isOpen: true },
+      { id: 'juninho', name: 'Juninho', queueCount: 0, isOpen: true }
+    ];
   }
 
+  let target = current.barbers.find(b => b.id === barberId);
+  if (target) {
+    if (action === 'increment') {
+      target.queueCount = (Number(target.queueCount) || 0) + 1;
+    } else if (action === 'decrement' || action === 'next') {
+      target.queueCount = Math.max(0, (Number(target.queueCount) || 0) - 1);
+    } else if (action === 'set') {
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num >= 0) target.queueCount = num;
+    } else if (action === 'toggle_status') {
+      target.isOpen = !target.isOpen;
+    }
+  } else {
+    if (action === 'increment') {
+      current.barbers[0].queueCount += 1;
+    } else if (action === 'decrement' || action === 'next') {
+      if (current.barbers[0].queueCount > 0) current.barbers[0].queueCount -= 1;
+    } else if (action === 'reset_all') {
+      current.barbers.forEach(b => b.queueCount = 0);
+    }
+  }
+
+  current.queueCount = current.barbers.reduce((acc, b) => acc + (Number(b.queueCount) || 0), 0);
   saveData(current);
   broadcastUpdate(current);
-  res.json({ success: true, queueCount: current.queueCount, data: getPublicData(current) });
+  res.json({ success: true, barbers: current.barbers, queueCount: current.queueCount, data: getPublicData(current) });
 });
 
 // Configurar tempo médio de atendimento e status da loja
