@@ -1,5 +1,5 @@
 {
-  "queueCount": 9,
+  "queueCount": 0,
   "avgTimePerClient": 20,
   "isOpen": true,
   "statusMessage": "Aberto e atendendo por ordem de chegada!",

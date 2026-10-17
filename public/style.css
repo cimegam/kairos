@@ -100,6 +100,7 @@ h1.brand-title {
   letter-spacing: 0.04em;
   background: var(--gold-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
   margin-bottom: 4px;
@@ -192,6 +193,7 @@ h1.brand-title {
   color: #ffffff;
   background: linear-gradient(180deg, #ffffff 40%, #d4af37 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 6px 20px rgba(212, 175, 55, 0.3));
   margin: 6px 0;
@@ -415,6 +417,7 @@ h1.brand-title {
   font-weight: 800;
   background: var(--gold-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
