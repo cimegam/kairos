@@ -4,7 +4,7 @@
   "isOpen": true,
   "statusMessage": "Aberto e atendendo por ordem de chegada!",
   "shopInfo": {
-    "name": "Kairos Barbearia",
+    "name": "Kairós Barbearia",
     "address": "Avenida Castro Alves, Jardim Carapina, Serra - ES",
     "referencePoint": "Próximo à praça principal",
     "googleMapsUrl": "https://www.google.com/maps/place/20%C2%B014'07.4%22S+40%C2%B017'09.5%22W/@-20.2353818,-40.2860516,7a,75y,158.98h,84.71t/data=!3m7!1e1!3m5!1sAQryWNzkTnjf6yXTV2Pkzw!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D5.292723189622194%26panoid%3DAQryWNzkTnjf6yXTV2Pkzw%26yaw%3D158.9810955420652!7i16384!8i8192!4m4!3m3!8m2!3d-20.2353866!4d-40.2859768?entry=ttu&g_ep=EgoyMDI2MTAwNi4wIKXMDSoASAFQAw%3D%3D",
@@ -14,15 +14,45 @@
   "services": [
     {
       "id": 1,
-      "name": "Corte Navalhado VIP",
-      "price": 35,
-      "duration": 30
+      "name": "Corte de cabelo",
+      "price": 30,
+      "duration": 25
     },
     {
       "id": 2,
-      "name": "Barba Completa",
-      "price": 25,
+      "name": "Sobrancelha",
+      "price": 5,
+      "duration": 10
+    },
+    {
+      "id": 3,
+      "name": "Barba",
+      "price": 20,
       "duration": 20
+    },
+    {
+      "id": 4,
+      "name": "Cavanhaque",
+      "price": 15,
+      "duration": 15
+    },
+    {
+      "id": 5,
+      "name": "Luzes (a partir de)",
+      "price": 75,
+      "duration": 60
+    },
+    {
+      "id": 6,
+      "name": "Reflexo",
+      "price": 80,
+      "duration": 60
+    },
+    {
+      "id": 7,
+      "name": "Nevou (a partir de)",
+      "price": 75,
+      "duration": 90
     }
   ],
   "promotion": {
@@ -31,5 +61,5 @@
     "description": "R$ 5 de desconto",
     "conditions": "Até 16h"
   },
-  "lastUpdated": "2026-10-15T15:43:02.354Z"
+  "lastUpdated": "2026-10-17T20:26:41.898Z"
 }
