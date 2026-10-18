@@ -54,43 +54,53 @@
     </div>
 
     <!-- Cards Individuais dos Barbeiros (João e Juninho) -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-      
-      <!-- Card João -->
-      <div class="card queue-card" style="padding: 16px 10px; margin-bottom: 0;">
-        <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); font-weight: 700;">
-          💈 Cadeira 1
-        </div>
-        <h2 style="font-size: 1.25rem; margin: 4px 0 8px 0; color: #fff; font-family: var(--font-heading);">
-          João
-        </h2>
-        <div class="queue-number" id="barber-queue-joao" style="font-size: 3rem; margin: 0;">0</div>
-        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">na fila agora</div>
-        <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 6px; font-size: 0.78rem;">
-          <div style="color: var(--gold-light); font-weight: 600;" id="barber-wait-joao">Sem espera</div>
-          <div style="color: var(--text-muted); font-size: 0.7rem;">Espera estimada</div>
-        </div>
-      </div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
 
-      <!-- Card Juninho -->
-      <div class="card queue-card" style="padding: 16px 10px; margin-bottom: 0;">
-        <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); font-weight: 700;">
-          💈 Cadeira 2
-        </div>
-        <h2 style="font-size: 1.25rem; margin: 4px 0 8px 0; color: #fff; font-family: var(--font-heading);">
-          Juninho
-        </h2>
-        <div class="queue-number" id="barber-queue-juninho" style="font-size: 3rem; margin: 0;">0</div>
-        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">na fila agora</div>
-        <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 6px; font-size: 0.78rem;">
-          <div style="color: var(--gold-light); font-weight: 600;" id="barber-wait-juninho">Sem espera</div>
-          <div style="color: var(--text-muted); font-size: 0.7rem;">Espera estimada</div>
-        </div>
-      </div>
-
+  <!-- Card João -->
+  <div class="card queue-card" style="padding: 14px 10px; margin-bottom: 0; text-align: center; position: relative; overflow: hidden;">
+    <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); font-weight: 700; margin-bottom: 8px;">
+      💈 Cadeira 1
     </div>
+    <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+      <div style="width: 76px; height: 76px; border-radius: 50%; padding: 2px; background: linear-gradient(135deg, #d4af37, #f3e5ab, #aa820a); box-shadow: 0 4px 12px rgba(212,175,55,0.25);">
+        <img src="/images/joao.jpg" alt="Barbeiro João" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;">
+      </div>
+    </div>
+    <h2 style="font-size: 1.2rem; margin: 0 0 6px 0; color: #fff; font-family: var(--font-heading);">
+      João
+    </h2>
+    <div class="queue-number" id="barber-queue-joao" style="font-size: 2.8rem; line-height: 1; margin: 0;">0</div>
+    <div style="font-size: 0.72rem; color: var(--text-muted); margin: 4px 0 10px 0;">na fila agora</div>
+    <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 6px; font-size: 0.75rem;">
+      <div style="color: var(--gold-light); font-weight: 600;" id="barber-wait-joao">Sem espera</div>
+      <div style="color: var(--text-muted); font-size: 0.68rem;">Espera estimada</div>
+    </div>
+  </div>
 
-    <!-- Barra de Informativo de Ritmo -->
+  <!-- Card Juninho -->
+  <div class="card queue-card" style="padding: 14px 10px; margin-bottom: 0; text-align: center; position: relative; overflow: hidden;">
+    <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); font-weight: 700; margin-bottom: 8px;">
+      💈 Cadeira 2
+    </div>
+    <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+      <div style="width: 76px; height: 76px; border-radius: 50%; padding: 2px; background: linear-gradient(135deg, #d4af37, #f3e5ab, #aa820a); box-shadow: 0 4px 12px rgba(212,175,55,0.25);">
+        <img src="/images/juninho.jpg" alt="Barbeiro Juninho" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;">
+      </div>
+    </div>
+    <h2 style="font-size: 1.2rem; margin: 0 0 6px 0; color: #fff; font-family: var(--font-heading);">
+      Juninho
+    </h2>
+    <div class="queue-number" id="barber-queue-juninho" style="font-size: 2.8rem; line-height: 1; margin: 0;">0</div>
+    <div style="font-size: 0.72rem; color: var(--text-muted); margin: 4px 0 10px 0;">na fila agora</div>
+    <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 6px; font-size: 0.75rem;">
+      <div style="color: var(--gold-light); font-weight: 600;" id="barber-wait-juninho">Sem espera</div>
+      <div style="color: var(--text-muted); font-size: 0.68rem;">Espera estimada</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Barra de Informativo de Ritmo -->
     <div class="card" style="padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-around; font-size: 0.8rem; text-align: center;">
       <div>
         <div style="color: var(--text-muted);">Tempo Médio</div>

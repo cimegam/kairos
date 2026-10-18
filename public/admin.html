@@ -50,15 +50,22 @@
 
       <!-- Controles Individuais por Barbeiro (João e Juninho) -->
 <div style="display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 18px;">
+
   <!-- Cadeira João -->
   <div class="card queue-card" style="border: 1px solid #d4af37; padding: 18px 14px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-      <div style="font-size: 0.85rem; font-weight: 700; color: #d4af37; text-transform: uppercase;">
-        💈 CADEIRA 1 - JOÃO
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 46px; height: 46px; border-radius: 50%; padding: 2px; background: linear-gradient(135deg, #d4af37, #f3e5ab); box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
+          <img src="/images/joao.jpg" alt="João" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;">
+        </div>
+        <div>
+          <div style="font-size: 0.72rem; font-weight: 700; color: #d4af37; text-transform: uppercase; letter-spacing: 0.5px;">CADEIRA 1</div>
+          <div style="font-size: 1.15rem; font-weight: 700; color: #fff;">João</div>
+        </div>
       </div>
-      <div style="font-size: 0.8rem; color: #9ca3af;" id="joao-wait">Sem espera</div>
+      <div style="font-size: 0.8rem; color: #9ca3af; text-align: right;" id="joao-wait">Sem espera</div>
     </div>
-    <div class="queue-number" id="dash-queue-joao" style="font-size: 3.2rem; margin: 0;">0</div>
+    <div class="queue-number" id="dash-queue-joao" style="font-size: 3.2rem; margin: 4px 0 0 0;">0</div>
     <div class="queue-label" style="margin-bottom: 12px;">aguardando o João</div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
       <button onclick="changeQueue('increment', 'joao')" class="btn btn-add" style="padding: 12px; font-size: 1rem; font-weight: 700;">
@@ -75,13 +82,19 @@
 
   <!-- Cadeira Juninho -->
   <div class="card queue-card" style="border: 1px solid #d4af37; padding: 18px 14px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-      <div style="font-size: 0.85rem; font-weight: 700; color: #d4af37; text-transform: uppercase;">
-        💈 CADEIRA 2 - JUNINHO
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 46px; height: 46px; border-radius: 50%; padding: 2px; background: linear-gradient(135deg, #d4af37, #f3e5ab); box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
+          <img src="/images/juninho.jpg" alt="Juninho" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;">
+        </div>
+        <div>
+          <div style="font-size: 0.72rem; font-weight: 700; color: #d4af37; text-transform: uppercase; letter-spacing: 0.5px;">CADEIRA 2</div>
+          <div style="font-size: 1.15rem; font-weight: 700; color: #fff;">Juninho</div>
+        </div>
       </div>
-      <div style="font-size: 0.8rem; color: #9ca3af;" id="juninho-wait">Sem espera</div>
+      <div style="font-size: 0.8rem; color: #9ca3af; text-align: right;" id="juninho-wait">Sem espera</div>
     </div>
-    <div class="queue-number" id="dash-queue-juninho" style="font-size: 3.2rem; margin: 0;">0</div>
+    <div class="queue-number" id="dash-queue-juninho" style="font-size: 3.2rem; margin: 4px 0 0 0;">0</div>
     <div class="queue-label" style="margin-bottom: 12px;">aguardando o Juninho</div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
       <button onclick="changeQueue('increment', 'juninho')" class="btn btn-add" style="padding: 12px; font-size: 1rem; font-weight: 700;">
@@ -95,6 +108,7 @@
       ✂️ PRÓXIMO ATENDIDO (JUNINHO)
     </button>
   </div>
+
 </div>
 
 <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
