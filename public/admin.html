@@ -425,21 +425,26 @@
       }
     }
 
-    async function changeQueue(action) {
+    async function changeQueue(action, barberId) {
       try {
+        const payload = { action };
+        if (barberId) payload.barberId = barberId;
+
         const res = await fetch('/api/admin/queue', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ action })
+          body: JSON.stringify(payload)
         });
         const data = await res.json();
         if (res.ok) {
-          document.getElementById('dash-queue-count').textContent = data.queueCount;
-          const avg = parseInt(document.getElementById('input-avg-time').value, 10) || 25;
-          document.getElementById('dash-wait-time').textContent = `~${data.queueCount * avg} min`;
+          if (data.data) {
+            populateFields(data.data);
+          } else if (data.barbers) {
+            populateFields({ barbers: data.barbers, avgTimePerClient: document.getElementById('input-avg-time')?.value });
+          }
         }
       } catch (err) {
         alert("Erro ao alterar fila. Verifique a conexão.");
@@ -447,7 +452,7 @@
     }
 
     async function resetQueue() {
-      if (!confirm("Tem certeza que deseja zerar a fila de clientes?")) return;
+      if (!confirm("Tem certeza que deseja zerar a fila de clientes de todos os barbeiros?")) return;
       try {
         const res = await fetch('/api/admin/queue', {
           method: 'POST',
@@ -455,11 +460,13 @@
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ action: 'set', value: 0 })
+          body: JSON.stringify({ action: 'reset_all' })
         });
+        const data = await res.json();
         if (res.ok) {
-          document.getElementById('dash-queue-count').textContent = 0;
-          document.getElementById('dash-wait-time').textContent = '~0 min';
+          if (data.data) {
+            populateFields(data.data);
+          }
         }
       } catch (err) {
         alert("Erro ao zerar fila.");
@@ -565,8 +572,7 @@
         try {
           const payload = JSON.parse(event.data);
           if (payload.type === 'UPDATE' && payload.data) {
-            document.getElementById('dash-queue-count').textContent = payload.data.queueCount;
-            document.getElementById('dash-wait-time').textContent = `~${payload.data.estimatedWaitMinutes} min`;
+            populateFields(payload.data);
           }
         } catch (e) {
           console.error(e);

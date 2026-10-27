@@ -182,6 +182,14 @@ app.post('/api/admin/queue', authMiddleware, (req, res) => {
       current.barbers[0].queueCount += 1;
     } else if (action === 'decrement' || action === 'next') {
       if (current.barbers[0].queueCount > 0) current.barbers[0].queueCount -= 1;
+    } else if (action === 'set') {
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num >= 0) {
+        current.barbers[0].queueCount = num;
+        for (let i = 1; i < current.barbers.length; i++) {
+          current.barbers[i].queueCount = 0;
+        }
+      }
     } else if (action === 'reset_all') {
       current.barbers.forEach(b => b.queueCount = 0);
     }
