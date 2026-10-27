@@ -52,6 +52,7 @@ async function runTests() {
   
   let passedCount = 0;
   let failedCount = 0;
+  const originalBackup = fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf-8') : null;
 
   function markPassed(name, engine) {
     passedCount++;
@@ -259,6 +260,9 @@ async function runTests() {
   } catch (err) {
     console.error('Erro crítico no executor de testes:', err);
   } finally {
+    if (originalBackup) {
+      fs.writeFileSync(DATA_FILE, originalBackup, 'utf-8');
+    }
     await closeDb();
     wss.close();
     server.close();
